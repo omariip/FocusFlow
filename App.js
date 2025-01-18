@@ -38,9 +38,9 @@ export default function App() {
     checkFirstLaunch();
   }, []);
 
-  // if (isFirstLaunch === null) {
-  //   return null; // Show a splash screen or loading indicator
-  // }
+  if (isFirstLaunch === null) {
+    return null; // Show a splash screen or loading indicator
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
