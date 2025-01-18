@@ -15,6 +15,7 @@ import Quotes from "./welcomeScreens/quotes";
 import StudyTimer from "./welcomeScreens/studyTimer";
 import Quiz from "./welcomeScreens/quiz";
 import Letter from "./welcomeScreens/letter";
+import HomeScreeen from "./screens/HomeScreen";
 
 const Stack = createStackNavigator();
 
@@ -55,8 +56,9 @@ export default function App() {
               <Stack.Screen name="StudyTimer" component={StudyTimer} />
               <Stack.Screen name="Quiz" component={Quiz} />
               <Stack.Screen name="Letter" component={Letter} />
-              <Stack.Screen name="Home" component={SignInScreen} />
+              <Stack.Screen name="Sign In" component={SignInScreen} />
               <Stack.Screen name="Sign Up" component={SignUpScreen} />
+              <Stack.Screen name="HomeScreen" component={HomeScreeen} />
               <Stack.Screen
                 name="Forgot Password"
                 component={ForgotPasswordScreen}
@@ -64,7 +66,7 @@ export default function App() {
             </>
           ) : (
             <>
-              <Stack.Screen name="Home" component={SignInScreen} />
+              <Stack.Screen name="Sign In" component={SignInScreen} />
               <Stack.Screen name="Sign Up" component={SignUpScreen} />
               <Stack.Screen
                 name="Forgot Password"

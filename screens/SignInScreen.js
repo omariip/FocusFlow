@@ -12,6 +12,7 @@ export default function SignInScreen({ navigation }) {
       .then((userCredential) => {
         Alert.alert("Welcome Back!");
         // Navigate to your app's main screen here
+        navigation.navigate("Home");
       })
       .catch((error) => Alert.alert(error.message));
   };
