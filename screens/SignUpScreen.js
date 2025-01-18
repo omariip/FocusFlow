@@ -35,7 +35,12 @@ export default function SignUpScreen({ navigation }) {
       <Button title="Sign Up" onPress={handleSignUp} />
       <Button
         title="Back to Sign In"
-        onPress={() => navigation.navigate("Sign In")}
+        onPress={() =>
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "Home" }],
+          })
+        }
       />
     </View>
   );

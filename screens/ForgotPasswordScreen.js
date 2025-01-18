@@ -24,7 +24,7 @@ export default function ForgotPasswordScreen({ navigation }) {
       <Button title="Send Reset Email" onPress={handlePasswordReset} />
       <Button
         title="Back to Sign In"
-        onPress={() => navigation.navigate("Sign In")}
+        onPress={() => navigation.navigate("Home")}
       />
     </View>
   );

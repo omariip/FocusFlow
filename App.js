@@ -39,7 +39,7 @@ export default function App() {
   }, []);
 
   if (isFirstLaunch === null) {
-    return null; // Show a splash screen or loading indicator
+    return null;
   }
 
   return (
@@ -56,9 +56,21 @@ export default function App() {
               <Stack.Screen name="Quiz" component={Quiz} />
               <Stack.Screen name="Letter" component={Letter} />
               <Stack.Screen name="Home" component={SignInScreen} />
+              <Stack.Screen name="Sign Up" component={SignUpScreen} />
+              <Stack.Screen
+                name="Forgot Password"
+                component={ForgotPasswordScreen}
+              />
             </>
           ) : (
-            <Stack.Screen name="Home" component={SignInScreen} />
+            <>
+              <Stack.Screen name="Home" component={SignInScreen} />
+              <Stack.Screen name="Sign Up" component={SignUpScreen} />
+              <Stack.Screen
+                name="Forgot Password"
+                component={ForgotPasswordScreen}
+              />
+            </>
           )}
         </Stack.Navigator>
       </NavigationContainer>
