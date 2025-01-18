@@ -9,17 +9,31 @@ export default function UpliftScreen({ navigation }) {
   const [selectedMood, setSelectedMood] = useState(null);
   const [quote, setQuote] = useState('');
   const [author, setAuthor] = useState('');
+  const [selfCareTips, setSelfCareTips] = useState('');
 
-  const fetchQuote = async (mood) => {
+  const moodSuggestions = {
+    Anxiety: "Take deep breaths and focus on grounding yourself. Try writing down your thoughts or meditating.",
+    Fear: "Identify the cause of your fear. Take small steps to address it, and don't hesitate to seek support.",
+    Confidence: "Keep a list of your achievements and remind yourself of your capabilities.",
+    Inspiration: "Explore new ideas or take a walk to spark creativity. Let your surroundings inspire you.",
+    Failure: "Remember, failure is a stepping stone to growth. Reflect and try again.",
+    Success: "Celebrate your wins and express gratitude. Share your joy with loved ones.",
+    Happiness: "Enjoy the moment and spread positivity. A gratitude journal can help maintain happiness.",
+    Time: "Manage your time effectively by prioritizing tasks. Take breaks when needed.",
+    Future: "Visualize your goals and take one step at a time toward them.",
+    Living: "Engage in activities that bring you joy. Stay present and cherish the little things."
+  };
+
+  const fetchQuote = async () => {
     try {
-      const response = await axios.get(`https://zenquotes.io/api/quotes/YOUR_API_KEY&keyword=${mood.toLowerCase()}`);
+      const response = await axios.get('https://zenquotes.io/api/random');
       const quotes = response.data;
       if (quotes.length > 0) {
-        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        const randomQuote = quotes[0];
         setQuote(randomQuote.q);
         setAuthor(randomQuote.a);
       } else {
-        setQuote("No quotes found for this mood.");
+        setQuote("No quotes found.");
         setAuthor("");
       }
     } catch (error) {
@@ -30,7 +44,16 @@ export default function UpliftScreen({ navigation }) {
 
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood);
-    fetchQuote(mood);
+    fetchQuote();
+    setSelfCareTips(moodSuggestions[mood]);
+  };
+
+  const handleSelfBetterment = () => {
+    if (selectedMood) {
+      Alert.alert("Self-Care Tips", selfCareTips || "Take care of yourself!");
+    } else {
+      Alert.alert("Select a Mood", "Please select a mood to receive suggestions.");
+    }
   };
 
   return (
@@ -55,6 +78,9 @@ export default function UpliftScreen({ navigation }) {
           <Text style={styles.author}>- {author}</Text>
         </View>
       )}
+      <TouchableOpacity style={styles.suggestionButton} onPress={handleSelfBetterment}>
+        <Text style={styles.suggestionButtonText}>Need Suggestions for Self Betterment?</Text>
+      </TouchableOpacity>
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Home")}>
           <Text>Home</Text>
@@ -122,6 +148,17 @@ const styles = StyleSheet.create({
   author: {
     fontSize: 18,
     textAlign: 'center',
+  },
+  suggestionButton: {
+    backgroundColor: '#007bff',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  suggestionButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
   navbar: {
     flexDirection: 'row',
