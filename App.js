@@ -15,7 +15,8 @@ import Quotes from "./welcomeScreens/quotes";
 import StudyTimer from "./welcomeScreens/studyTimer";
 import Quiz from "./welcomeScreens/quiz";
 import Letter from "./welcomeScreens/letter";
-import HomeScreeen from "./screens/HomeScreen";
+import HomeScreen from "./screens/HomeScreen";
+import UpliftScreen from "./screens/Uplift";
 
 const Stack = createStackNavigator();
 
@@ -58,7 +59,8 @@ export default function App() {
               <Stack.Screen name="Letter" component={Letter} />
               <Stack.Screen name="Sign In" component={SignInScreen} />
               <Stack.Screen name="Sign Up" component={SignUpScreen} />
-              <Stack.Screen name="HomeScreen" component={HomeScreeen} />
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="Uplift" component={UpliftScreen} />
               <Stack.Screen
                 name="Forgot Password"
                 component={ForgotPasswordScreen}
@@ -68,6 +70,7 @@ export default function App() {
             <>
               <Stack.Screen name="Sign In" component={SignInScreen} />
               <Stack.Screen name="Sign Up" component={SignUpScreen} />
+              <Stack.Screen name="Home" component={HomeScreen} />
               <Stack.Screen
                 name="Forgot Password"
                 component={ForgotPasswordScreen}
@@ -77,7 +80,7 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
-  );
+  );  
 }
 
 const styles = StyleSheet.create({
