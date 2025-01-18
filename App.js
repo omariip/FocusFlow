@@ -71,6 +71,7 @@ export default function App() {
               <Stack.Screen name="Sign In" component={SignInScreen} />
               <Stack.Screen name="Sign Up" component={SignUpScreen} />
               <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="Uplift" component={UpliftScreen} />
               <Stack.Screen
                 name="Forgot Password"
                 component={ForgotPasswordScreen}
