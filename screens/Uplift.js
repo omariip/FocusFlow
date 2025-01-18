@@ -10,21 +10,8 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
 
-const moods = [
-  "Anxiety",
-  "Fear",
-  "Confidence",
-  "Inspiration",
-  "Failure",
-  "Success",
-  "Happiness",
-  "Time",
-  "Future",
-  "Living",
-];
 const moods = ['Anxiety', 'Fear', 'Confidence', 'Inspiration', 'Failure', 'Success', 'Happiness', 'Time', 'Future', 'Living'];
 
-export default function UpliftScreen({ navigation }) {
 export default function UpliftScreen({ navigation }) {
   const [selectedMood, setSelectedMood] = useState(null);
   const [quote, setQuote] = useState('');
@@ -211,4 +198,3 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
-
