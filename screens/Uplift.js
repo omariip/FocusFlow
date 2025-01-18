@@ -1,10 +1,30 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
-import axios from 'axios';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+import axios from "axios";
 
+const moods = [
+  "Anxiety",
+  "Fear",
+  "Confidence",
+  "Inspiration",
+  "Failure",
+  "Success",
+  "Happiness",
+  "Time",
+  "Future",
+  "Living",
+];
 const moods = ['Anxiety', 'Fear', 'Confidence', 'Inspiration', 'Failure', 'Success', 'Happiness', 'Time', 'Future', 'Living'];
 
+export default function UpliftScreen({ navigation }) {
 export default function UpliftScreen({ navigation }) {
   const [selectedMood, setSelectedMood] = useState(null);
   const [quote, setQuote] = useState('');
@@ -58,20 +78,38 @@ export default function UpliftScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* Top Bar */}
       <View style={styles.topBar}>
         <Text style={styles.appName}>FocusFlow</Text>
-        <FontAwesome name="user" size={24} color="black" style={styles.profileIcon} />
+        <FontAwesome
+          name="user"
+          size={24}
+          color="black"
+          style={styles.profileIcon}
+        />
       </View>
+
+      {/* Mood Selector */}
       <View style={styles.questionContainer}>
         <Text style={styles.question}>How are you feeling today?</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moodContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.moodContainer}
+        >
           {moods.map((mood, index) => (
-            <TouchableOpacity key={index} style={styles.moodBox} onPress={() => handleMoodSelect(mood)}>
+            <TouchableOpacity
+              key={index}
+              style={styles.moodBox}
+              onPress={() => handleMoodSelect(mood)}
+            >
               <Text style={styles.moodText}>{mood}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
+
+      {/* Quote Display */}
       {selectedMood && (
         <View style={styles.quoteContainer}>
           <Text style={styles.quote}>{quote}</Text>
@@ -99,24 +137,24 @@ export default function UpliftScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     padding: 20,
   },
   topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 10,
   },
   appName: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   profileIcon: {
     marginRight: 10,
   },
   questionContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 20,
   },
   question: {
@@ -124,10 +162,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   moodContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   moodBox: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     borderRadius: 5,
     padding: 10,
     marginHorizontal: 5,
@@ -136,13 +174,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   quoteContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 20,
   },
   quote: {
     fontSize: 24,
-    fontStyle: 'italic',
-    textAlign: 'center',
+    fontStyle: "italic",
+    textAlign: "center",
     marginBottom: 10,
   },
   author: {
@@ -161,14 +199,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     borderTopWidth: 1,
     paddingTop: 10,
+    paddingBottom: 10,
     paddingBottom: 10,
   },
   navItem: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
 });
+
