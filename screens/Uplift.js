@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'rea
 import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
 
-const moods = ['Happy', 'Stressed', 'Excited', 'Nervous', 'Depressed', 'Calm', 'Anxious', 'Content'];
+const moods = ['Anxiety', 'Fear', 'Confidence', 'Inspiration', 'Failure', 'Success', 'Happiness', 'Time', 'Future', 'Living'];
 
 export default function UpliftScreen() {
   const [selectedMood, setSelectedMood] = useState(null);
@@ -12,12 +12,19 @@ export default function UpliftScreen() {
 
   const fetchQuote = async (mood) => {
     try {
-      const response = await axios.get(`https://zenquotes.io/api/random`);
-      const quoteData = response.data[0];
-      setQuote(quoteData.q);
-      setAuthor(quoteData.a);
+      const response = await axios.get(`https://zenquotes.io/api/quotes/[YOUR_API_KEY]&keyword=${mood.toLowerCase()}`);
+      const quotes = response.data;
+      if (quotes.length > 0) {
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        setQuote(randomQuote.q);
+        setAuthor(randomQuote.a);
+      } else {
+        setQuote("No quotes found for this mood.");
+        setAuthor("");
+      }
     } catch (error) {
       console.error(error);
+      Alert.alert('Error', 'Failed to fetch quote. Please check your network connection and try again.');
     }
   };
 
