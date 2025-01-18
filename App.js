@@ -17,6 +17,7 @@ import Quiz from "./welcomeScreens/quiz";
 import Letter from "./welcomeScreens/letter";
 import HomeScreen from "./screens/HomeScreen";
 import UpliftScreen from "./screens/Uplift";
+import StudyScreen from "./screens/Study";
 
 const Stack = createStackNavigator();
 
@@ -61,6 +62,7 @@ export default function App() {
               <Stack.Screen name="Sign Up" component={SignUpScreen} />
               <Stack.Screen name="Home" component={HomeScreen} />
               <Stack.Screen name="Uplift" component={UpliftScreen} />
+              <Stack.Screen name="Study" component={StudyScreen} />
               <Stack.Screen
                 name="Forgot Password"
                 component={ForgotPasswordScreen}
@@ -72,6 +74,7 @@ export default function App() {
               <Stack.Screen name="Sign Up" component={SignUpScreen} />
               <Stack.Screen name="Home" component={HomeScreen} />
               <Stack.Screen name="Uplift" component={UpliftScreen} />
+              <Stack.Screen name="Study" component={StudyScreen} />
               <Stack.Screen
                 name="Forgot Password"
                 component={ForgotPasswordScreen}

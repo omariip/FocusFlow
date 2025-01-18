@@ -5,14 +5,14 @@ import axios from 'axios';
 
 const moods = ['Anxiety', 'Fear', 'Confidence', 'Inspiration', 'Failure', 'Success', 'Happiness', 'Time', 'Future', 'Living'];
 
-export default function UpliftScreen() {
+export default function UpliftScreen({ navigation }) {
   const [selectedMood, setSelectedMood] = useState(null);
   const [quote, setQuote] = useState('');
   const [author, setAuthor] = useState('');
 
   const fetchQuote = async (mood) => {
     try {
-      const response = await axios.get(`https://zenquotes.io/api/quotes/[YOUR_API_KEY]&keyword=${mood.toLowerCase()}`);
+      const response = await axios.get(`https://zenquotes.io/api/quotes/YOUR_API_KEY&keyword=${mood.toLowerCase()}`);
       const quotes = response.data;
       if (quotes.length > 0) {
         const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
@@ -56,13 +56,13 @@ export default function UpliftScreen() {
         </View>
       )}
       <View style={styles.navbar}>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Home")}>
           <Text>Home</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Study")}>
           <Text>Study</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Uplift")}>
           <Text>Uplift</Text>
         </TouchableOpacity>
       </View>
@@ -128,6 +128,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderTopWidth: 1,
     paddingTop: 10,
+    paddingBottom: 10,
   },
   navItem: {
     flex: 1,
