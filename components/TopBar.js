@@ -29,7 +29,7 @@ const TopBar = () => {
       setModalVisible(false);
       // Add Firebase sign-out logic here
       console.log("Signing out...");
-      navigation.replace("Login"); // Redirect to login screen
+      navigation.replace("SignIn"); // Redirect to login screen
     } catch (error) {
       console.error("Error signing out:", error);
       Alert.alert("Error", "Failed to sign out. Please try again.");
