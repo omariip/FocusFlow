@@ -1,183 +1,162 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Alert,
-} from "react-native";
-import TopBar from "../components/TopBar";
+import React, { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
-export default function Study() {
-  const [hours, setHours] = useState("00");
-  const [minutes, setMinutes] = useState("00");
-  const [seconds, setSeconds] = useState("00");
-  const [isTimerStart, setIsTimerStart] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(0);
-  const timerRef = useRef(null);
+const Study = () => {
+  const WORK_TIME = 25 * 60 * 1000; // 25 minutes in milliseconds
+  const SHORT_BREAK = 5 * 60 * 1000; // 5 minutes in milliseconds
 
-  const startTimer = () => {
-    const totalSeconds =
-      parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
-    if (totalSeconds <= 0) {
-      Alert.alert("Please set a valid time to start the timer.");
-      return;
-    }
-
-    setTimeLeft(totalSeconds);
-    setIsTimerStart(true);
-    setIsPaused(false);
-  };
-
-  const pauseTimer = () => {
-    setIsTimerStart(false);
-    setIsPaused(true);
-    clearInterval(timerRef.current);
-  };
-
-  const resumeTimer = () => {
-    setIsTimerStart(true);
-    setIsPaused(false);
-  };
-
-  const resetTimer = () => {
-    setIsTimerStart(false);
-    setIsPaused(false);
-    clearInterval(timerRef.current);
-    setHours("00");
-    setMinutes("00");
-    setSeconds("00");
-    setTimeLeft(0);
-  };
-
-  const formatTime = (time) => {
-    const hrs = Math.floor(time / 3600);
-    const mins = Math.floor((time % 3600) / 60);
-    const secs = time % 60;
-    return `${hrs.toString().padStart(2, "0")}:${mins
-      .toString()
-      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
+  const [currentDuration, setCurrentDuration] = useState(WORK_TIME);
+  const [remainingTime, setRemainingTime] = useState(WORK_TIME);
+  const [isRunning, setIsRunning] = useState(false);
+  const [startTime, setStartTime] = useState(null);
 
   useEffect(() => {
-    if (isTimerStart) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current);
-            setIsTimerStart(false);
-            Alert.alert("Timer Finished");
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
+    let timer;
+    if (isRunning) {
+      timer = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const newRemainingTime = Math.max(currentDuration - elapsed, 0); // Prevent negative numbers
+        setRemainingTime(newRemainingTime);
 
-    return () => clearInterval(timerRef.current);
-  }, [isTimerStart]);
+        if (newRemainingTime === 0) {
+          clearInterval(timer);
+          alert("Time is up!");
+          handleSwitchSession();
+        }
+      }, 1000);
+    } else {
+      clearInterval(timer);
+    }
+    return () => clearInterval(timer);
+  }, [isRunning, startTime, currentDuration]);
+
+  const handleStartPause = () => {
+    if (!isRunning) {
+      setStartTime(Date.now() - (currentDuration - remainingTime)); // Adjust start time to resume
+    }
+    setIsRunning(!isRunning);
+  };
+
+  const handleReset = () => {
+    setIsRunning(false);
+    setRemainingTime(currentDuration);
+  };
+
+  const handleSwitchSession = () => {
+    setIsRunning(false);
+    const nextDuration = currentDuration === WORK_TIME ? SHORT_BREAK : WORK_TIME;
+    setCurrentDuration(nextDuration);
+    setRemainingTime(nextDuration);
+  };
+
+  const customFormatTime = (milliseconds) => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  };
 
   return (
     <View style={styles.container}>
-      <TopBar />
+      <Text style={styles.description}>
+        The Pomodoro Technique helps you focus and manage time by alternating 25 minutes of work
+        with 5-minute breaks.
+      </Text>
+      <Text style={styles.title}>
+        {currentDuration === WORK_TIME ? "Work Session" : "Short Break"}
+      </Text>
       <View style={styles.timerContainer}>
-        <View style={styles.timeInputContainer}>
-          <TextInput
-            style={styles.timeInput}
-            keyboardType="numeric"
-            value={hours}
-            onChangeText={setHours}
-            maxLength={2}
-            editable={!isTimerStart && !isPaused}
-          />
-          <Text style={styles.timeSeparator}>:</Text>
-          <TextInput
-            style={styles.timeInput}
-            keyboardType="numeric"
-            value={minutes}
-            onChangeText={setMinutes}
-            maxLength={2}
-            editable={!isTimerStart && !isPaused}
-          />
-          <Text style={styles.timeSeparator}>:</Text>
-          <TextInput
-            style={styles.timeInput}
-            keyboardType="numeric"
-            value={seconds}
-            onChangeText={setSeconds}
-            maxLength={2}
-            editable={!isTimerStart && !isPaused}
-          />
-        </View>
-        <Text style={styles.timer}>{formatTime(timeLeft)}</Text>
-        <View style={styles.timerButtons}>
-          {!isTimerStart && !isPaused ? (
-            <TouchableOpacity onPress={startTimer}>
-              <Text style={styles.buttonText}>Start</Text>
-            </TouchableOpacity>
-          ) : isPaused ? (
-            <TouchableOpacity onPress={resumeTimer}>
-              <Text style={styles.buttonText}>Resume</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity onPress={pauseTimer}>
-              <Text style={styles.buttonText}>Pause</Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity onPress={resetTimer}>
-            <Text style={styles.buttonText}>Reset</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.timerText}>{customFormatTime(remainingTime)}</Text>
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            { backgroundColor: isRunning ? "#E63946" : "#4CAF50" },
+          ]}
+          onPress={handleStartPause}
+        >
+          <Text style={styles.buttonText}>
+            {isRunning ? "Pause" : "Start"}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleReset}>
+          <Text style={styles.buttonText}>Reset</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleSwitchSession}>
+          <Text style={styles.buttonText}>
+            Switch to {currentDuration === WORK_TIME ? "Break" : "Work"}
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#1D3557",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    backgroundColor: "#f9f9f9",
+  },
+  description: {
+    fontSize: 14,
+    color: "#A8DADC",
+    textAlign: "center",
+    marginBottom: 15,
+    lineHeight: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#F1FAEE",
+    marginBottom: 20,
   },
   timerContainer: {
-    backgroundColor: "#fff",
+    marginBottom: 30,
+    backgroundColor: "#457B9D",
     padding: 20,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-    borderRadius: 10,
-    marginTop: 50,
-  },
-  timeInputContainer: {
-    flexDirection: "row",
+    borderRadius: 100,
+    justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
+    width: 220,
+    height: 220,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
   },
-  timeInput: {
-    width: 50,
-    height: 50,
-    borderColor: "gray",
-    borderWidth: 1,
-    textAlign: "center",
-    fontSize: 20,
-    marginHorizontal: 5,
-  },
-  timeSeparator: {
-    fontSize: 20,
-  },
-  timer: {
-    fontSize: 30,
+  timerText: {
+    fontSize: 48,
     fontWeight: "bold",
-    marginVertical: 10,
-    textAlign: "center",
+    color: "#F1FAEE",
   },
-  timerButtons: {
+  buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    gap: 10,
+    marginTop: 20,
+  },
+  button: {
+    backgroundColor: "#A8DADC",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginHorizontal: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 5,
   },
   buttonText: {
-    fontSize: 18,
-    color: "#4CAF50",
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#1D3557",
+    textAlign: "center",
   },
 });
+
+export default Study;
