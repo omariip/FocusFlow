@@ -15,7 +15,6 @@ import Quotes from "./welcomeScreens/quotes";
 import StudyTimer from "./welcomeScreens/studyTimer";
 import Quiz from "./welcomeScreens/quiz";
 import Letter from "./welcomeScreens/letter";
-import HomeScreen from "./screens/HomeScreen";
 import UpliftScreen from "./screens/Uplift";
 import TabNavigator from "./navigation/TabNavigator";
 
@@ -61,7 +60,6 @@ export default function App() {
               <Stack.Screen name="Letter" component={Letter} />
               <Stack.Screen name="SignIn" component={SignInScreen} />
               <Stack.Screen name="SignUp" component={SignUpScreen} />
-              <Stack.Screen name="Home" component={HomeScreen} />
               <Stack.Screen name="Uplift" component={UpliftScreen} />
               <Stack.Screen
                 name="ForgotPassword"
