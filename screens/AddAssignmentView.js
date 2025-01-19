@@ -37,7 +37,7 @@ export default function AddAssignment({ route, navigation }) {
       />
       <TextInput
         style={styles.input}
-        placeholder="Due Date (e.g., YYYY-MM-DD)"
+        placeholder="Due Date"
         value={dueDate}
         onChangeText={setDueDate}
       />

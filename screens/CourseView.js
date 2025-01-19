@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -11,32 +11,37 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../firebaseConfig";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function CourseView({ route, navigation }) {
   const { course } = route.params;
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchAssignments = async () => {
-      try {
-        const querySnapshot = await getDocs(
-          collection(firestore, `courses/${course.id}/assignments`)
-        );
-        const fetchedAssignments = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setAssignments(fetchedAssignments);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching assignments:", error);
-        setLoading(false);
-      }
-    };
+  const fetchAssignments = async () => {
+    try {
+      setLoading(true); // Show loading spinner while fetching
+      const querySnapshot = await getDocs(
+        collection(firestore, `courses/${course.id}/assignments`)
+      );
+      const fetchedAssignments = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAssignments(fetchedAssignments);
+    } catch (error) {
+      console.error("Error fetching assignments:", error);
+    } finally {
+      setLoading(false); // Hide loading spinner
+    }
+  };
 
-    fetchAssignments();
-  }, [course.id]);
+  // Refresh assignments whenever the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      fetchAssignments();
+    }, [course.id])
+  );
 
   const renderAssignment = ({ item }) => (
     <View style={styles.assignmentItem}>
