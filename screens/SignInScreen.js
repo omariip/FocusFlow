@@ -10,9 +10,12 @@ export default function SignInScreen({ navigation, onSignIn }) {
   const handleSignIn = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        Alert.alert("Welcome Back!");
-        if (onSignIn) onSignIn();
-        navigation.navigate("Home");
+        // Alert.alert("Welcome Back!");
+        // if (onSignIn) onSignIn();
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Home" }],
+        });
       })
       .catch((error) => Alert.alert(error.message));
   };

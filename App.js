@@ -18,6 +18,7 @@ import Letter from "./welcomeScreens/letter";
 import UpliftScreen from "./screens/Uplift";
 // import StudyScreen from "./screens/Study";
 import TabNavigator from "./navigation/TabNavigator";
+import Study from "./screens/StudyScreen";
 
 const Stack = createStackNavigator();
 
@@ -49,39 +50,107 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator>
           {isFirstLaunch ? (
             <>
-              <Stack.Screen name="Welcome" component={Welcome} />
-              <Stack.Screen name="Assignment" component={Assignment} />
-              <Stack.Screen name="Tasks" component={Task} />
-              <Stack.Screen name="Quotes" component={Quotes} />
-              <Stack.Screen name="StudyTimer" component={StudyTimer} />
-              <Stack.Screen name="Quiz" component={Quiz} />
-              <Stack.Screen name="Letter" component={Letter} />
-              <Stack.Screen name="SignIn" component={SignInScreen} />
-              <Stack.Screen name="SignUp" component={SignUpScreen} />
-              <Stack.Screen name="Uplift" component={UpliftScreen} />
-              <Stack.Screen name="Study" component={StudyScreen} />
+              <Stack.Screen
+                name="Welcome"
+                component={Welcome}
+                options={{ headerShown: true }} // Hide header for this screen
+              />
+              <Stack.Screen
+                name="Assignment"
+                component={Assignment}
+                options={{ headerShown: true }} // Show header with back button
+              />
+              <Stack.Screen
+                name="Tasks"
+                component={Task}
+                options={{ headerShown: true }} // Show header with back button
+              />
+              <Stack.Screen
+                name="Quotes"
+                component={Quotes}
+                options={{ headerShown: true }} // Show header with back button
+              />
+              <Stack.Screen
+                name="StudyTimer"
+                component={StudyTimer}
+                options={{ headerShown: true }} // Show header with back button
+              />
+              <Stack.Screen
+                name="Quiz"
+                component={Quiz}
+                options={{ headerShown: true }} // Show header with back button
+              />
+              <Stack.Screen
+                name="Letter"
+                component={Letter}
+                options={{ headerShown: true }} // Show header with back button
+              />
+              <Stack.Screen
+                name="SignIn"
+                component={SignInScreen}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="SignUp"
+                component={SignUpScreen}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="Uplift"
+                component={UpliftScreen}
+                options={{ headerShown: true }} // Show header with back button
+              />
+              <Stack.Screen
+                name="Study"
+                component={Study}
+                options={{ headerShown: true }} // Show header with back button
+              />
               <Stack.Screen
                 name="ForgotPassword"
                 component={ForgotPasswordScreen}
+                options={{ headerShown: true }} // Show header with back button
               />
-              <Stack.Screen name="Home" component={TabNavigator} />
+              <Stack.Screen
+                name="Home"
+                component={TabNavigator}
+                options={{ headerShown: true }}
+              />
             </>
           ) : (
             <>
-              {/* <Stack.Screen name="Sign In" component={SignInScreen} />
-              <Stack.Screen name="Sign Up" component={SignUpScreen} />
-              <Stack.Screen name="Home" component={HomeScreen} />
-              <Stack.Screen name="Uplift" component={UpliftScreen} />
-              <Stack.Screen name="Study" component={StudyScreen} />
+              <Stack.Screen
+                name="Sign In"
+                component={SignInScreen}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="Sign Up"
+                component={SignUpScreen}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="Uplift"
+                component={UpliftScreen}
+                options={{ headerShown: true }} // Show header with back button
+              />
+              <Stack.Screen
+                name="Study"
+                component={Study}
+                options={{ headerShown: true }} // Show header with back button
+              />
               <Stack.Screen
                 name="Forgot Password"
                 component={ForgotPasswordScreen}
-              /> */}
-              <Stack.Screen name="SignIn" component={SignInScreen} />
-              <Stack.Screen name="Home" component={TabNavigator} />
+                options={{ headerShown: true }} // Show header with back button
+              />
+              <Stack.Screen
+                name="Home"
+                component={TabNavigator}
+                options={{ headerShown: true }}
+              />
             </>
           )}
         </Stack.Navigator>

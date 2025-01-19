@@ -11,7 +11,10 @@ export default function SignUpScreen({ navigation }) {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         Alert.alert("Account created successfully!");
-        navigation.navigate("Sign In");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Home" }],
+        });
       })
       .catch((error) => Alert.alert(error.message));
   };
@@ -33,15 +36,10 @@ export default function SignUpScreen({ navigation }) {
         onChangeText={setPassword}
       />
       <Button title="Sign Up" onPress={handleSignUp} />
-      <Button
+      {/* <Button
         title="Back to Sign In"
-        onPress={() =>
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "Sign In" }],
-          })
-        }
-      />
+        onPress={() => navigation.navigate("Sign In")}
+      /> */}
     </View>
   );
 }

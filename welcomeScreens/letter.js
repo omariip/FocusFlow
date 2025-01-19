@@ -6,7 +6,10 @@ export default function Letter({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to the App!</Text>
       <Text style={styles.text}>This is the Letter screen.</Text>
-      <Button title="Go to Home" onPress={() => navigation.navigate("Home")} />
+      <Button
+        title="Go to Home"
+        onPress={() => navigation.navigate("SignIn")}
+      />
     </View>
   );
 }

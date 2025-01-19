@@ -99,7 +99,7 @@ export default function HomeScreen({ navigation }) {
         contentContainerStyle={styles.listContainer}
       />
 
-      <View style={styles.navbar}>
+      {/* <View style={styles.navbar}>
         <TouchableOpacity onPress={() => navigation.navigate("Home")}>
           <Text>Home</Text>
         </TouchableOpacity>
@@ -109,7 +109,7 @@ export default function HomeScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.navigate("Uplift")}>
           <Text>Uplift</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 }
