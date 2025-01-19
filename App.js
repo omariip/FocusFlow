@@ -23,6 +23,7 @@ import AddCourse from "./screens/AddCourse";
 import CourseView from "./screens/CourseView";
 import AddAssignment from "./screens/AddAssignmentView";
 import AssignmentView from "./screens/AssignmentView";
+import LetterToFuture from "./screens/LetterToFuture";
 
 const Stack = createStackNavigator();
 
@@ -142,6 +143,7 @@ export default function App() {
                 component={AssignmentView}
                 options={{ headerShown: true }}
               />
+              <Stack.Screen name="LetterToFuture" component={LetterToFuture} />
             </>
           ) : (
             <>
@@ -195,6 +197,7 @@ export default function App() {
                 component={AssignmentView}
                 options={{ headerShown: true }}
               />
+              <Stack.Screen name="LetterToFuture" component={LetterToFuture} />
             </>
           )}
         </Stack.Navigator>
