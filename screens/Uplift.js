@@ -49,20 +49,19 @@ export default function UpliftScreen() {
         messages: [
           {
             role: "user",
-            content: `Provide recommendations for feeling "${mood}".`,
-          },
-          {
-            role: "user",
-            content:
-              "Generate a list of bullet points, in the following format [{advice: string}]",
+            content: `Provide recommendations for feeling "${mood}". Generate a list of bullet points in plain text.`,
           },
         ],
       });
 
       const rawResponse = completion.choices[0].message.content;
-      const matches = [...rawResponse.matchAll(/advice:\s*\\?"([^"]+)/g)];
 
-      const adviceArray = matches.map((match) => match[1].trim());
+      // Split the response into lines and filter out empty or non-advice lines
+      const adviceArray = rawResponse
+        .split("\n")
+        .map((line) => line.replace(/^\s*-\s*/, "").trim()) // Remove leading bullet points
+        .filter((line) => line.length > 0); // Filter out empty lines
+
       setAdvice(adviceArray);
       setCheckedItems(new Array(adviceArray.length).fill(false)); // Reset checkboxes
     } catch (error) {
@@ -194,7 +193,7 @@ const styles = StyleSheet.create({
   questionContainer: {
     alignItems: "center",
     marginVertical: 20,
-    marginTop: 40
+    marginTop: 40,
   },
   question: {
     fontSize: 18,
@@ -217,6 +216,7 @@ const styles = StyleSheet.create({
   },
   adviceContainer: {
     marginTop: 20,
+    paddingHorizontal: 10, // Add padding to prevent text from touching edges
   },
   adviceTitle: {
     fontSize: 18,
@@ -225,18 +225,22 @@ const styles = StyleSheet.create({
   },
   adviceItem: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start", // Align text to the top
     marginVertical: 5,
+    paddingRight: 10, // Avoid text getting cut off by the edge
   },
   adviceText: {
-    marginLeft: 10,
+    flex: 1, // Allow text to occupy available space
+    flexWrap: "wrap", // Ensure long text wraps
     fontSize: 16,
+    marginRight: 10, // Prevent text from touching the right edge
   },
   placeholderText: {
     fontSize: 16,
     fontStyle: "italic",
     color: "#555",
     marginTop: 20,
+    textAlign: "center", // Center align placeholder text
   },
   checkBox: {
     width: 24,
@@ -246,11 +250,12 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#007BFF",
+    backgroundColor: "#4CAF50",
     marginRight: 10,
   },
+
   quoteButton: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#4CAF50",
     padding: 15,
     borderRadius: 5,
     alignItems: "center",

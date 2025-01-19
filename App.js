@@ -166,7 +166,7 @@ export default function App() {
                 options={{ headerShown: true }} // Show header with back button
               />
               <Stack.Screen
-                name="Forgot Password"
+                name="ForgotPassword"
                 component={ForgotPasswordScreen}
                 options={{ headerShown: true }} // Show header with back button
               />

@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e0e0e0",
     borderRadius: 10,
-    marginTop: 50
+    marginTop: 50,
   },
   timeInputContainer: {
     flexDirection: "row",
@@ -178,6 +178,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 18,
-    color: "blue",
+    color: "#4CAF50",
   },
 });
