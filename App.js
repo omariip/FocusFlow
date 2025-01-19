@@ -5,8 +5,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import SignUpScreen from "./screens/SignUpScreen";
 import SignInScreen from "./screens/SignInScreen";
+import SignUpScreen from "./screens/SignUpScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
 import Welcome from "./welcomeScreens/welcome";
 import Assignment from "./welcomeScreens/assignment";
@@ -15,13 +15,15 @@ import Quotes from "./welcomeScreens/quotes";
 import StudyTimer from "./welcomeScreens/studyTimer";
 import Quiz from "./welcomeScreens/quiz";
 import Letter from "./welcomeScreens/letter";
-import HomeScreen from "./screens/HomeScreen";
 import UpliftScreen from "./screens/Uplift";
+// import StudyScreen from "./screens/Study";
+import TabNavigator from "./navigation/TabNavigator";
 
 const Stack = createStackNavigator();
 
 export default function App() {
   const [isFirstLaunch, setIsFirstLaunch] = useState(null);
+
   useEffect(() => {
     const checkFirstLaunch = async () => {
       try {
@@ -57,31 +59,35 @@ export default function App() {
               <Stack.Screen name="StudyTimer" component={StudyTimer} />
               <Stack.Screen name="Quiz" component={Quiz} />
               <Stack.Screen name="Letter" component={Letter} />
-              <Stack.Screen name="Sign In" component={SignInScreen} />
-              <Stack.Screen name="Sign Up" component={SignUpScreen} />
-              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="SignIn" component={SignInScreen} />
+              <Stack.Screen name="SignUp" component={SignUpScreen} />
               <Stack.Screen name="Uplift" component={UpliftScreen} />
+              <Stack.Screen name="Study" component={StudyScreen} />
               <Stack.Screen
-                name="Forgot Password"
+                name="ForgotPassword"
                 component={ForgotPasswordScreen}
               />
+              <Stack.Screen name="Home" component={TabNavigator} />
             </>
           ) : (
             <>
-              <Stack.Screen name="Sign In" component={SignInScreen} />
+              {/* <Stack.Screen name="Sign In" component={SignInScreen} />
               <Stack.Screen name="Sign Up" component={SignUpScreen} />
               <Stack.Screen name="Home" component={HomeScreen} />
               <Stack.Screen name="Uplift" component={UpliftScreen} />
+              <Stack.Screen name="Study" component={StudyScreen} />
               <Stack.Screen
                 name="Forgot Password"
                 component={ForgotPasswordScreen}
-              />
+              /> */}
+              <Stack.Screen name="SignIn" component={SignInScreen} />
+              <Stack.Screen name="Home" component={TabNavigator} />
             </>
           )}
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
-  );  
+  );
 }
 
 const styles = StyleSheet.create({

@@ -38,7 +38,7 @@ export default function SignUpScreen({ navigation }) {
         onPress={() =>
           navigation.reset({
             index: 0,
-            routes: [{ name: "Home" }],
+            routes: [{ name: "Sign In" }],
           })
         }
       />

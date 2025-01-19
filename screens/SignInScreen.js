@@ -2,19 +2,18 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import { auth } from "../firebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { CommonActions } from '@react-navigation/native';
 
-
-export default function SignInScreen({ navigation }) {
+export default function SignInScreen({ navigation, onSignIn }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSignIn = () => {
     signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      Alert.alert("Welcome Back!");
-      navigation.navigate("Home");
-    })
+      .then((userCredential) => {
+        Alert.alert("Welcome Back!");
+        if (onSignIn) onSignIn();
+        navigation.navigate("Home");
+      })
       .catch((error) => Alert.alert(error.message));
   };
 
