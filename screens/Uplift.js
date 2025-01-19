@@ -11,6 +11,7 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import OpenAI from "openai";
 import axios from "axios";
+import TopBar from "../components/TopBar";
 
 const moods = [
   "Anxiety",
@@ -107,90 +108,93 @@ export default function UpliftScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Mood Selector */}
-      <View style={styles.questionContainer}>
-        <Text style={styles.question}>How are you feeling today?</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.moodContainer}
-        >
-          {moods.map((mood, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.moodBox,
-                selectedMood === mood && styles.selectedMood,
-              ]}
-              onPress={() => handleMoodSelect(mood)}
-              disabled={loading}
-            >
-              <Text style={styles.moodText}>{mood}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-
-      {/* Display Selected Mood Advice */}
-      {loading ? (
-        <ActivityIndicator size="large" color="#007BFF" />
-      ) : advice.length > 0 ? (
-        <View style={styles.adviceContainer}>
-          <Text style={styles.adviceTitle}>
-            Suggestions for "{selectedMood}":
-          </Text>
-          {advice.map((item, index) => (
-            <View key={index} style={styles.adviceItem}>
+    <View style={styles.container}>
+      <TopBar />
+      <ScrollView>
+        <View style={styles.questionContainer}>
+          <Text style={styles.question}>How are you feeling today?</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.moodContainer}
+          >
+            {moods.map((mood, index) => (
               <TouchableOpacity
-                style={styles.checkBox}
-                onPress={() => toggleCheckBox(index)}
+                key={index}
+                style={[
+                  styles.moodBox,
+                  selectedMood === mood && styles.selectedMood,
+                ]}
+                onPress={() => handleMoodSelect(mood)}
+                disabled={loading}
               >
-                {checkedItems[index] && (
-                  <FontAwesome name="check" size={16} color="white" />
-                )}
+                <Text style={styles.moodText}>{mood}</Text>
               </TouchableOpacity>
-              <Text style={styles.adviceText}>{item}</Text>
-            </View>
-          ))}
+            ))}
+          </ScrollView>
         </View>
-      ) : (
-        selectedMood && (
-          <Text style={styles.placeholderText}>
-            No advice yet. Select a mood to get suggestions.
-          </Text>
-        )
-      )}
 
-      {/* Quote Generation Button */}
-      <TouchableOpacity
-        style={styles.quoteButton}
-        onPress={fetchQuote}
-        disabled={loading}
-      >
-        <Text style={styles.quoteButtonText}>A Quote Just For You...</Text>
-      </TouchableOpacity>
+        {/* Display Selected Mood Advice */}
+        {loading ? (
+          <ActivityIndicator size="large" color="#007BFF" />
+        ) : advice.length > 0 ? (
+          <View style={styles.adviceContainer}>
+            <Text style={styles.adviceTitle}>
+              Suggestions for "{selectedMood}":
+            </Text>
+            {advice.map((item, index) => (
+              <View key={index} style={styles.adviceItem}>
+                <TouchableOpacity
+                  style={styles.checkBox}
+                  onPress={() => toggleCheckBox(index)}
+                >
+                  {checkedItems[index] && (
+                    <FontAwesome name="check" size={16} color="white" />
+                  )}
+                </TouchableOpacity>
+                <Text style={styles.adviceText}>{item}</Text>
+              </View>
+            ))}
+          </View>
+        ) : (
+          selectedMood && (
+            <Text style={styles.placeholderText}>
+              No advice yet. Select a mood to get suggestions.
+            </Text>
+          )
+        )}
 
-      {/* Display Generated Quote */}
-      {quote && (
-        <View style={styles.quoteContainer}>
-          <Text style={styles.quote}>"{quote}"</Text>
-          <Text style={styles.author}>- {author}</Text>
-        </View>
-      )}
-    </ScrollView>
+        {/* Quote Generation Button */}
+        <TouchableOpacity
+          style={styles.quoteButton}
+          onPress={fetchQuote}
+          disabled={loading}
+        >
+          <Text style={styles.quoteButtonText}>A Quote Just For You...</Text>
+        </TouchableOpacity>
+
+        {/* Display Generated Quote */}
+        {quote && (
+          <View style={styles.quoteContainer}>
+            <Text style={styles.quote}>"{quote}"</Text>
+            <Text style={styles.author}>- {author}</Text>
+          </View>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     padding: 20,
     backgroundColor: "#f9f9f9",
   },
   questionContainer: {
     alignItems: "center",
     marginVertical: 20,
+    marginTop: 40
   },
   question: {
     fontSize: 18,

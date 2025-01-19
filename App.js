@@ -120,7 +120,7 @@ export default function App() {
               <Stack.Screen
                 name="Home"
                 component={TabNavigator}
-                options={{ headerShown: true }}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="AddCourse"
@@ -173,7 +173,7 @@ export default function App() {
               <Stack.Screen
                 name="Home"
                 component={TabNavigator}
-                options={{ headerShown: true }}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="AddCourse"
