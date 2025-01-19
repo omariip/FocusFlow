@@ -6,10 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import OpenAI from "openai";
 import axios from "axios";
-import TopBar from "../components/TopBar";
 
 const moods = [
   "Anxiety",
@@ -24,34 +25,69 @@ const moods = [
   "Living",
 ];
 
-export default function UpliftScreen({ navigation }) {
+export default function UpliftScreen() {
   const [selectedMood, setSelectedMood] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [advice, setAdvice] = useState([]);
+  const [checkedItems, setCheckedItems] = useState([]);
   const [quote, setQuote] = useState("");
   const [author, setAuthor] = useState("");
-  const [selfCareTips, setSelfCareTips] = useState("");
 
-  const moodSuggestions = {
-    Anxiety:
-      "Take deep breaths and focus on grounding yourself. Try writing down your thoughts or meditating.",
-    Fear: "Identify the cause of your fear. Take small steps to address it, and don't hesitate to seek support.",
-    Confidence:
-      "Keep a list of your achievements and remind yourself of your capabilities.",
-    Inspiration:
-      "Explore new ideas or take a walk to spark creativity. Let your surroundings inspire you.",
-    Failure:
-      "Remember, failure is a stepping stone to growth. Reflect and try again.",
-    Success:
-      "Celebrate your wins and express gratitude. Share your joy with loved ones.",
-    Happiness:
-      "Enjoy the moment and spread positivity. A gratitude journal can help maintain happiness.",
-    Time: "Manage your time effectively by prioritizing tasks. Take breaks when needed.",
-    Future: "Visualize your goals and take one step at a time toward them.",
-    Living:
-      "Engage in activities that bring you joy. Stay present and cherish the little things.",
+  const openai = new OpenAI({
+    apiKey:
+      "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",
+  });
+
+  // Fetch advice based on the selected mood
+  const fetchAdvice = async (mood) => {
+    try {
+      setLoading(true);
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "user",
+            content: `Provide recommendations for feeling "${mood}".`,
+          },
+          {
+            role: "user",
+            content:
+              "Generate a list of bullet points, in the following format [{advice: string}]",
+          },
+        ],
+      });
+
+      const rawResponse = completion.choices[0].message.content;
+      const matches = [...rawResponse.matchAll(/advice:\s*\\?"([^"]+)/g)];
+
+      const adviceArray = matches.map((match) => match[1].trim());
+      setAdvice(adviceArray);
+      setCheckedItems(new Array(adviceArray.length).fill(false)); // Reset checkboxes
+    } catch (error) {
+      console.error("Error fetching advice:", error);
+      Alert.alert("Error", "Failed to fetch advice. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleMoodSelect = (mood) => {
+    setSelectedMood(mood);
+    fetchAdvice(mood);
+  };
+
+  // Toggle checkbox state
+  const toggleCheckBox = (index) => {
+    const updatedCheckedItems = [...checkedItems];
+    updatedCheckedItems[index] = !updatedCheckedItems[index];
+    setCheckedItems(updatedCheckedItems);
+  };
+
+  // Fetch a random quote
   const fetchQuote = async () => {
     try {
+      setLoading(true);
       const response = await axios.get("https://zenquotes.io/api/random");
       const quotes = response.data;
       if (quotes.length > 0) {
@@ -63,45 +99,15 @@ export default function UpliftScreen({ navigation }) {
         setAuthor("");
       }
     } catch (error) {
-      console.error(error);
-      Alert.alert(
-        "Error",
-        "Failed to fetch quote. Please check your network connection and try again."
-      );
-    }
-  };
-
-  const handleMoodSelect = (mood) => {
-    setSelectedMood(mood);
-    fetchQuote();
-    setSelfCareTips(moodSuggestions[mood]);
-  };
-
-  const handleSelfBetterment = () => {
-    if (selectedMood) {
-      Alert.alert("Self-Care Tips", selfCareTips || "Take care of yourself!");
-    } else {
-      Alert.alert(
-        "Select a Mood",
-        "Please select a mood to receive suggestions."
-      );
+      console.error("Error fetching quote:", error);
+      Alert.alert("Error", "Failed to fetch quote. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      {/* Top Bar */}
-      {/* <View style={styles.topBar}>
-        <Text style={styles.appName}>FocusFlow</Text>
-        <FontAwesome
-          name="user"
-          size={24}
-          color="black"
-          style={styles.profileIcon}
-        />
-      </View> */}
-
-      <TopBar />
+    <ScrollView contentContainerStyle={styles.container}>
       {/* Mood Selector */}
       <View style={styles.questionContainer}>
         <Text style={styles.question}>How are you feeling today?</Text>
@@ -113,8 +119,12 @@ export default function UpliftScreen({ navigation }) {
           {moods.map((mood, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.moodBox}
+              style={[
+                styles.moodBox,
+                selectedMood === mood && styles.selectedMood,
+              ]}
               onPress={() => handleMoodSelect(mood)}
+              disabled={loading}
             >
               <Text style={styles.moodText}>{mood}</Text>
             </TouchableOpacity>
@@ -122,54 +132,61 @@ export default function UpliftScreen({ navigation }) {
         </ScrollView>
       </View>
 
-      {/* Quote Display */}
-      {selectedMood && (
+      {/* Display Selected Mood Advice */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#007BFF" />
+      ) : advice.length > 0 ? (
+        <View style={styles.adviceContainer}>
+          <Text style={styles.adviceTitle}>
+            Suggestions for "{selectedMood}":
+          </Text>
+          {advice.map((item, index) => (
+            <View key={index} style={styles.adviceItem}>
+              <TouchableOpacity
+                style={styles.checkBox}
+                onPress={() => toggleCheckBox(index)}
+              >
+                {checkedItems[index] && (
+                  <FontAwesome name="check" size={16} color="white" />
+                )}
+              </TouchableOpacity>
+              <Text style={styles.adviceText}>{item}</Text>
+            </View>
+          ))}
+        </View>
+      ) : (
+        selectedMood && (
+          <Text style={styles.placeholderText}>
+            No advice yet. Select a mood to get suggestions.
+          </Text>
+        )
+      )}
+
+      {/* Quote Generation Button */}
+      <TouchableOpacity
+        style={styles.quoteButton}
+        onPress={fetchQuote}
+        disabled={loading}
+      >
+        <Text style={styles.quoteButtonText}>A Quote Just For You...</Text>
+      </TouchableOpacity>
+
+      {/* Display Generated Quote */}
+      {quote && (
         <View style={styles.quoteContainer}>
-          <Text style={styles.quote}>{quote}</Text>
+          <Text style={styles.quote}>"{quote}"</Text>
           <Text style={styles.author}>- {author}</Text>
         </View>
       )}
-      <TouchableOpacity
-        style={styles.suggestionButton}
-        onPress={handleSelfBetterment}
-      >
-        <Text style={styles.suggestionButtonText}>
-          Need Suggestions for Self Betterment?
-        </Text>
-      </TouchableOpacity>
-      {/* <View style={styles.navbar}>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Home")}>
-          <Text>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Study")}>
-          <Text>Study</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Uplift")}>
-          <Text>Uplift</Text>
-        </TouchableOpacity>
-      </View> */}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "space-between",
+    flexGrow: 1,
     padding: 20,
-  },
-  topBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  appName: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  profileIcon: {
-    marginRight: 10,
+    backgroundColor: "#f9f9f9",
   },
   questionContainer: {
     alignItems: "center",
@@ -188,7 +205,55 @@ const styles = StyleSheet.create({
     padding: 10,
     marginHorizontal: 5,
   },
+  selectedMood: {
+    backgroundColor: "#dcdcdc",
+  },
   moodText: {
+    fontSize: 16,
+  },
+  adviceContainer: {
+    marginTop: 20,
+  },
+  adviceTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  adviceItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  adviceText: {
+    marginLeft: 10,
+    fontSize: 16,
+  },
+  placeholderText: {
+    fontSize: 16,
+    fontStyle: "italic",
+    color: "#555",
+    marginTop: 20,
+  },
+  checkBox: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#007BFF",
+    marginRight: 10,
+  },
+  quoteButton: {
+    backgroundColor: "#007BFF",
+    padding: 15,
+    borderRadius: 5,
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  quoteButtonText: {
+    color: "#fff",
     fontSize: 16,
   },
   quoteContainer: {
@@ -204,28 +269,5 @@ const styles = StyleSheet.create({
   author: {
     fontSize: 18,
     textAlign: "center",
-  },
-  suggestionButton: {
-    backgroundColor: "#007bff",
-    padding: 15,
-    borderRadius: 5,
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  suggestionButtonText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  navbar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderTopWidth: 1,
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingBottom: 10,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: "center",
   },
 });

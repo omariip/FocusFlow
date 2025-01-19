@@ -1,14 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
-  TextInput,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
   Alert,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import OpenAI from "openai";
 
 const moods = [
   "Anxious",
@@ -22,207 +24,120 @@ const moods = [
   "Confused",
 ];
 
-export default function Study({ navigation }) {
+export default function Study() {
   const [selectedMood, setSelectedMood] = useState(null);
-  const [hours, setHours] = useState("00");
-  const [minutes, setMinutes] = useState("00");
-  const [seconds, setSeconds] = useState("00");
-  const [isTimerStart, setIsTimerStart] = useState(false);
-  const [isPaused, setIsPaused] = useState(false); // Track pause state
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [aiSuggestedTime, setAiSuggestedTime] = useState(
-    "AI suggests: 45 minutes of study time"
-  );
-  const timerRef = useRef(null);
+  const [result, setResult] = useState([]);
+  const [checkedItems, setCheckedItems] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleMoodSelect = (mood) => {
-    if (!isTimerStart && !isPaused) {
-      // Prevent selecting mood when timer is running or paused
-      setSelectedMood(mood);
-    }
-  };
+  const openai = new OpenAI({
+    apiKey:
+      "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",
+  });
 
-  const startTimer = () => {
-    const totalSeconds =
-      parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
-    if (totalSeconds <= 0) {
-      Alert.alert("Please set a valid time to start the timer.");
+  const fetchData = async () => {
+    if (!selectedMood) {
+      Alert.alert("Please select a mood first.");
       return;
     }
 
-    setTimeLeft(totalSeconds); // Set time left
-    setIsTimerStart(true); // Start the timer
-    setIsPaused(false); // Reset pause state
-  };
+    try {
+      setLoading(true);
 
-  const resumeTimer = () => {
-    setIsTimerStart(true);
-    setIsPaused(false);
-  };
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "user",
+            content: `Provide recommendations for feeling "${selectedMood}".`,
+          },
+          {
+            role: "user",
+            content:
+              "Generate a list of bullet points, in the following format [{advice: string}]",
+          },
+        ],
+      });
 
-  const pauseTimer = () => {
-    setIsTimerStart(false);
-    setIsPaused(true); // Set pause state
-    clearInterval(timerRef.current);
-  };
+      const rawResponse = completion.choices[0].message.content;
+      const matches = [...rawResponse.matchAll(/advice:\s*\\?"([^"]+)/g)];
 
-  const resetTimer = () => {
-    setIsTimerStart(false);
-    setIsPaused(false); // Reset pause state
-    clearInterval(timerRef.current);
-    setHours("00");
-    setMinutes("00");
-    setSeconds("00");
-    setTimeLeft(0); // Reset time to 0 on reset
-  };
+      const adviceArray = matches.map((match) => ({
+        advice: match[1].trim(),
+      }));
 
-  const formatTime = (time) => {
-    const hrs = Math.floor(time / 3600);
-    const mins = Math.floor((time % 3600) / 60);
-    const secs = time % 60;
-    return `${hrs.toString().padStart(2, "0")}:${mins
-      .toString()
-      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  useEffect(() => {
-    if (isTimerStart) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current);
-            setIsTimerStart(false);
-            Alert.alert("Timer Finished");
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      setResult(adviceArray);
+      setCheckedItems(new Array(adviceArray.length).fill(false));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    return () => clearInterval(timerRef.current); // Cleanup interval when unmounting
-  }, [isTimerStart]);
+  const toggleCheckBox = (index) => {
+    const updatedCheckedItems = [...checkedItems];
+    updatedCheckedItems[index] = !updatedCheckedItems[index];
+    setCheckedItems(updatedCheckedItems);
+  };
+
+  const renderAdvice = ({ item, index }) => (
+    <View style={styles.adviceItem}>
+      <TouchableOpacity
+        onPress={() => toggleCheckBox(index)}
+        style={styles.checkBox}
+      >
+        {checkedItems[index] && (
+          <FontAwesome name="check" size={16} color="white" />
+        )}
+      </TouchableOpacity>
+      <Text style={styles.adviceText}>{item.advice}</Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      {/* <View style={styles.topBar}>
-        <Text style={styles.appName}>FocusFlow</Text>
-        <FontAwesome name="user" size={24} color="black" style={styles.profileIcon} />
-      </View> */}
-      <TopBar />
+      <Text style={styles.title}>How are you feeling?</Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.moodContainer}
+      >
+        {moods.map((mood, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.moodBox,
+              selectedMood === mood && styles.selectedMood,
+            ]}
+            onPress={() => setSelectedMood(mood)}
+            disabled={loading}
+          >
+            <Text style={styles.moodText}>{mood}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
-      <View style={styles.questionContainer}>
-        <Text style={styles.question}>
-          How are you feeling before going in the zone?
+      {selectedMood && (
+        <Text style={styles.selectedMoodText}>
+          Selected Mood: {selectedMood}
         </Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.moodContainer,
-            { justifyContent: "center" },
-          ]} // Apply justifyContent here
-        >
-          {moods.map((mood, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.moodBox,
-                selectedMood === mood && styles.selectedMood,
-              ]}
-              onPress={() => handleMoodSelect(mood)}
-              disabled={isTimerStart || isPaused} // Disable mood selection when timer is running or paused
-            >
-              <Text style={styles.moodText}>{mood}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+      )}
 
-        {/* Display selected mood */}
-        {selectedMood && (
-          <Text style={styles.selectedMoodText}>
-            Selected Mood: {selectedMood}
-          </Text>
-        )}
-      </View>
-
-      <View style={styles.mainContent}>
-        <View style={styles.timerContainer}>
-          <View style={styles.timeInputContainer}>
-            <TextInput
-              style={styles.timeInput}
-              keyboardType="numeric"
-              value={hours}
-              onChangeText={setHours}
-              maxLength={2}
-              editable={!isTimerStart && !isPaused} // Allow editing time only when not running or paused
-            />
-            <Text style={styles.timeSeparator}>:</Text>
-            <TextInput
-              style={styles.timeInput}
-              keyboardType="numeric"
-              value={minutes}
-              onChangeText={setMinutes}
-              maxLength={2}
-              editable={!isTimerStart && !isPaused}
-            />
-            <Text style={styles.timeSeparator}>:</Text>
-            <TextInput
-              style={styles.timeInput}
-              keyboardType="numeric"
-              value={seconds}
-              onChangeText={setSeconds}
-              maxLength={2}
-              editable={!isTimerStart && !isPaused}
-            />
-          </View>
-          <Text style={styles.timer}>{formatTime(timeLeft)}</Text>
-          <View style={styles.timerButtons}>
-            {!isTimerStart && !isPaused ? (
-              <TouchableOpacity onPress={startTimer}>
-                <Text style={styles.buttonText}>Start</Text>
-              </TouchableOpacity>
-            ) : isPaused ? (
-              <TouchableOpacity onPress={resumeTimer}>
-                <Text style={styles.buttonText}>Resume</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity onPress={pauseTimer}>
-                <Text style={styles.buttonText}>Pause</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity onPress={resetTimer}>
-              <Text style={styles.buttonText}>Reset</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* AI Prompt at the bottom of the screen */}
-        <View style={styles.aiPromptContainer}>
-          <Text style={styles.aiPromptText}>{aiSuggestedTime}</Text>
-        </View>
-      </View>
-
-      <View style={styles.navbar}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("Home")}
-        >
-          <Text>Home</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#007BFF" />
+      ) : result.length > 0 ? (
+        <FlatList
+          data={result}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderAdvice}
+          contentContainerStyle={styles.listContainer}
+        />
+      ) : (
+        <TouchableOpacity style={styles.fetchButton} onPress={fetchData}>
+          <Text style={styles.fetchButtonText}>Get Recommendations</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("Study")}
-        >
-          <Text>Study</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("Uplift")}
-        >
-          <Text>Uplift</Text>
-        </TouchableOpacity>
-      </View>
+      )}
     </View>
   );
 }
@@ -230,115 +145,79 @@ export default function Study({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "space-between",
     padding: 20,
+    backgroundColor: "#f9f9f9",
   },
-  topBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  appName: {
-    fontSize: 24,
+  title: {
+    fontSize: 20,
     fontWeight: "bold",
-  },
-  profileIcon: {
-    marginRight: 10,
-  },
-  questionContainer: {
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  question: {
-    fontSize: 18,
     marginBottom: 10,
+    textAlign: "center",
   },
   moodContainer: {
     flexDirection: "row",
-    flexWrap: "wrap", // Allows moods to wrap when space is tight
-    justifyContent: "center", // Centers the moods
+    justifyContent: "center",
+    marginVertical: 20,
   },
   moodBox: {
-    backgroundColor: "#f0f0f0",
-    borderRadius: 5,
-    padding: 10,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
     margin: 5,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   selectedMood: {
-    backgroundColor: "#d3d3d3",
+    backgroundColor: "#dcdcdc",
+    borderColor: "#c0c0c0",
   },
   moodText: {
     fontSize: 16,
+    textAlign: "center",
   },
   selectedMoodText: {
-    marginTop: 10,
-    fontSize: 18,
-    fontWeight: "500",
+    fontSize: 16,
     color: "green",
+    textAlign: "center",
+    marginVertical: 10,
   },
-  mainContent: {
-    flex: 1,
-    justifyContent: "center", // Centers the timer and AI prompt vertically
+  listContainer: {
+    marginTop: 20,
   },
-  timerContainer: {
-    alignItems: "center",
-  },
-  timeInputContainer: {
+  adviceItem: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
   },
-  timeInput: {
-    width: 50,
-    height: 50,
-    borderColor: "gray",
-    borderWidth: 1,
-    textAlign: "center",
-    fontSize: 20,
-  },
-  timeSeparator: {
-    fontSize: 20,
-    marginHorizontal: 5,
-  },
-  timer: {
-    fontSize: 30,
-    fontWeight: "bold",
-    marginVertical: 20,
-  },
-  timerButtons: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
-  },
-  buttonText: {
-    fontSize: 18,
-    color: "blue",
-  },
-  aiPromptContainer: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
-    backgroundColor: "#f9f9f9",
-    padding: 15,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  aiPromptText: {
+  adviceText: {
+    marginLeft: 10,
     fontSize: 16,
-    color: "#333",
   },
-  navbar: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 10,
-    backgroundColor: "#f8f8f8",
+  checkBox: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#007BFF",
   },
-  navItem: {
-    padding: 10,
+  fetchButton: {
+    backgroundColor: "#007BFF",
+    padding: 15,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  fetchButtonText: {
+    color: "white",
+    fontSize: 16,
   },
 });
