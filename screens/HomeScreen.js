@@ -20,7 +20,7 @@ export default function HomeScreen({ navigation }) {
           style={styles.profileIcon}
         />
       </View>
-      <View style={styles.navbar}>
+      {/* <View style={styles.navbar}>
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => navigation.navigate("Study")}
@@ -33,7 +33,7 @@ export default function HomeScreen({ navigation }) {
         >
           <Text>Uplift</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
       <TouchableOpacity style={styles.addButton}>
         <FontAwesome name="plus" size={24} color="white" />
       </TouchableOpacity>

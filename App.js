@@ -16,11 +16,8 @@ import StudyTimer from "./welcomeScreens/studyTimer";
 import Quiz from "./welcomeScreens/quiz";
 import Letter from "./welcomeScreens/letter";
 import UpliftScreen from "./screens/Uplift";
-<<<<<<< HEAD
-import StudyScreen from "./screens/Study";
-=======
+// import StudyScreen from "./screens/Study";
 import TabNavigator from "./navigation/TabNavigator";
->>>>>>> feature/bottom-top-tabs
 
 const Stack = createStackNavigator();
 
@@ -83,6 +80,8 @@ export default function App() {
                 name="Forgot Password"
                 component={ForgotPasswordScreen}
               /> */}
+              <Stack.Screen name="SignIn" component={SignInScreen} />
+              <Stack.Screen name="Home" component={TabNavigator} />
             </>
           )}
         </Stack.Navigator>

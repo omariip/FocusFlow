@@ -106,7 +106,7 @@ export default function UpliftScreen({ navigation }) {
       <TouchableOpacity style={styles.suggestionButton} onPress={handleSelfBetterment}>
         <Text style={styles.suggestionButtonText}>Need Suggestions for Self Betterment?</Text>
       </TouchableOpacity>
-      <View style={styles.navbar}>
+      {/* <View style={styles.navbar}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Home")}>
           <Text>Home</Text>
         </TouchableOpacity>
@@ -116,7 +116,7 @@ export default function UpliftScreen({ navigation }) {
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Uplift")}>
           <Text>Uplift</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 }
