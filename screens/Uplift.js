@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,8 +11,9 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import OpenAI from "openai";
 import axios from "axios";
+import { collection, getDocs } from "firebase/firestore";
+import { firestore } from "../firebaseConfig"; // Replace with your Firebase config import
 import TopBar from "../components/TopBar";
-import Constants from "expo-constants";
 
 const moods = [
   "Anxiety",
@@ -34,17 +35,45 @@ export default function UpliftScreen() {
   const [checkedItems, setCheckedItems] = useState([]);
   const [quote, setQuote] = useState("");
   const [author, setAuthor] = useState("");
+  const [apiKey, setApiKey] = useState(null);
+  const [apiLoading, setApiLoading] = useState(true);
 
-  // const apiKey =
-  // Constants.expoConfig?.extra?.apiKey || Constants.manifest?.extra?.apiKey;
-  const apiKey = Constants.expoConfig.extra.apiKey;
+  useEffect(() => {
+    const fetchApiKey = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(firestore, "apiKey"));
+        let key = null;
 
-  const openai = new OpenAI({
-    apiKey: apiKey,
-  });
+        querySnapshot.forEach((doc) => {
+          if (doc.id === "apiKey") {
+            key = doc.data().apiKey;
+          }
+        });
 
-  // Fetch advice based on the selected mood
+        if (key) {
+          setApiKey(key);
+        } else {
+          throw new Error("API Key not found in Firestore.");
+        }
+      } catch (error) {
+        console.error("Error fetching API key from Firestore:", error);
+        Alert.alert("Error", "Failed to fetch API key. Please try again.");
+      } finally {
+        setApiLoading(false);
+      }
+    };
+
+    fetchApiKey();
+  }, []);
+
   const fetchAdvice = async (mood) => {
+    if (!apiKey) {
+      Alert.alert("Error", "API key not loaded. Please try again later.");
+      return;
+    }
+
+    const openai = new OpenAI({ apiKey });
+
     try {
       setLoading(true);
 
@@ -60,14 +89,13 @@ export default function UpliftScreen() {
 
       const rawResponse = completion.choices[0].message.content;
 
-      // Split the response into lines and filter out empty or non-advice lines
       const adviceArray = rawResponse
         .split("\n")
-        .map((line) => line.replace(/^\s*-\s*/, "").trim()) // Remove leading bullet points
-        .filter((line) => line.length > 0); // Filter out empty lines
+        .map((line) => line.replace(/^\s*-\s*/, "").trim())
+        .filter((line) => line.length > 0);
 
       setAdvice(adviceArray);
-      setCheckedItems(new Array(adviceArray.length).fill(false)); // Reset checkboxes
+      setCheckedItems(new Array(adviceArray.length).fill(false));
     } catch (error) {
       console.error("Error fetching advice:", error);
       Alert.alert("Error", "Failed to fetch advice. Please try again.");
@@ -81,14 +109,12 @@ export default function UpliftScreen() {
     fetchAdvice(mood);
   };
 
-  // Toggle checkbox state
   const toggleCheckBox = (index) => {
     const updatedCheckedItems = [...checkedItems];
     updatedCheckedItems[index] = !updatedCheckedItems[index];
     setCheckedItems(updatedCheckedItems);
   };
 
-  // Fetch a random quote
   const fetchQuote = async () => {
     try {
       setLoading(true);
@@ -109,6 +135,15 @@ export default function UpliftScreen() {
       setLoading(false);
     }
   };
+
+  if (apiLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007BFF" />
+        <Text style={styles.loadingText}>Loading configuration...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -137,7 +172,6 @@ export default function UpliftScreen() {
           </ScrollView>
         </View>
 
-        {/* Display Selected Mood Advice */}
         {loading ? (
           <ActivityIndicator size="large" color="#007BFF" />
         ) : advice.length > 0 ? (
@@ -167,7 +201,6 @@ export default function UpliftScreen() {
           )
         )}
 
-        {/* Quote Generation Button */}
         <TouchableOpacity
           style={styles.quoteButton}
           onPress={fetchQuote}
@@ -176,7 +209,6 @@ export default function UpliftScreen() {
           <Text style={styles.quoteButtonText}>A Quote Just For You...</Text>
         </TouchableOpacity>
 
-        {/* Display Generated Quote */}
         {quote && (
           <View style={styles.quoteContainer}>
             <Text style={styles.quote}>"{quote}"</Text>
@@ -220,7 +252,7 @@ const styles = StyleSheet.create({
   },
   adviceContainer: {
     marginTop: 20,
-    paddingHorizontal: 10, // Add padding to prevent text from touching edges
+    paddingHorizontal: 10,
   },
   adviceTitle: {
     fontSize: 18,
@@ -229,22 +261,22 @@ const styles = StyleSheet.create({
   },
   adviceItem: {
     flexDirection: "row",
-    alignItems: "flex-start", // Align text to the top
+    alignItems: "flex-start",
     marginVertical: 5,
-    paddingRight: 10, // Avoid text getting cut off by the edge
+    paddingRight: 10,
   },
   adviceText: {
-    flex: 1, // Allow text to occupy available space
-    flexWrap: "wrap", // Ensure long text wraps
+    flex: 1,
+    flexWrap: "wrap",
     fontSize: 16,
-    marginRight: 10, // Prevent text from touching the right edge
+    marginRight: 10,
   },
   placeholderText: {
     fontSize: 16,
     fontStyle: "italic",
     color: "#555",
     marginTop: 20,
-    textAlign: "center", // Center align placeholder text
+    textAlign: "center",
   },
   checkBox: {
     width: 24,
@@ -257,7 +289,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#4CAF50",
     marginRight: 10,
   },
-
   quoteButton: {
     backgroundColor: "#4CAF50",
     padding: 15,
@@ -282,5 +313,15 @@ const styles = StyleSheet.create({
   author: {
     fontSize: 18,
     textAlign: "center",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#555",
   },
 });

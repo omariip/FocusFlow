@@ -8,12 +8,12 @@ import {
   Button,
   ActivityIndicator,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { firestore } from "../firebaseConfig";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
 import OpenAI from "openai";
-import Constants from "expo-constants";
 
 export default function AssignmentView({ route }) {
   const { assignment } = route.params;
@@ -22,12 +22,39 @@ export default function AssignmentView({ route }) {
   const [checkedItems, setCheckedItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checklistExists, setChecklistExists] = useState(false);
+  const [apiKey, setApiKey] = useState(null);
+  const [apiLoading, setApiLoading] = useState(true);
 
-  const apiKey = Constants.expoConfig.extra.apiKey;
+  // Fetch API key from Firestore
+  useEffect(() => {
+    const fetchApiKey = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(firestore, "apiKey"));
+        let key = null;
 
-  const openai = new OpenAI({
-    apiKey: apiKey,
-  });
+        querySnapshot.forEach((doc) => {
+          if (doc.id === "apiKey") {
+            key = doc.data().apiKey;
+          }
+        });
+
+        if (key) {
+          setApiKey(key);
+        } else {
+          throw new Error("API Key not found in Firestore.");
+        }
+      } catch (error) {
+        console.error("Error fetching API key from Firestore:", error);
+        Alert.alert("Error", "Failed to fetch API key. Please try again.");
+      } finally {
+        setApiLoading(false);
+      }
+    };
+
+    fetchApiKey();
+  }, []);
+
+  // Fetch checklist from Firestore
   useEffect(() => {
     const fetchChecklist = async () => {
       try {
@@ -56,6 +83,13 @@ export default function AssignmentView({ route }) {
   }, [assignment.id]);
 
   const fetchData = async () => {
+    if (!apiKey) {
+      Alert.alert("Error", "API key not loaded. Please try again later.");
+      return;
+    }
+
+    const openai = new OpenAI({ apiKey });
+
     try {
       setLoading(true);
 
@@ -122,10 +156,11 @@ export default function AssignmentView({ route }) {
     </TouchableOpacity>
   );
 
-  if (loading) {
+  if (apiLoading || loading) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#007BFF" />
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
@@ -210,5 +245,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#007BFF",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#555",
   },
 });
