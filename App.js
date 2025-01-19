@@ -61,37 +61,37 @@ export default function App() {
               <Stack.Screen
                 name="Welcome"
                 component={Welcome}
-                options={{ headerShown: true }} // Hide header for this screen
+                options={{ headerShown: false }} // Hide header for this screen
               />
               <Stack.Screen
                 name="Assignment"
                 component={Assignment}
-                options={{ headerShown: true }} // Show header with back button
+                options={{ headerShown: false }} // Show header with back button
               />
               <Stack.Screen
                 name="Tasks"
                 component={Task}
-                options={{ headerShown: true }} // Show header with back button
+                options={{ headerShown: false }} // Show header with back button
               />
               <Stack.Screen
                 name="Quotes"
                 component={Quotes}
-                options={{ headerShown: true }} // Show header with back button
+                options={{ headerShown: false }} // Show header with back button
               />
               <Stack.Screen
                 name="StudyTimer"
                 component={StudyTimer}
-                options={{ headerShown: true }} // Show header with back button
+                options={{ headerShown: false }} // Show header with back button
               />
-              <Stack.Screen
+              {/* <Stack.Screen
                 name="Quiz"
                 component={Quiz}
-                options={{ headerShown: true }} // Show header with back button
-              />
+                options={{ headerShown: false }} // Show header with back button
+              /> */}
               <Stack.Screen
                 name="Letter"
                 component={Letter}
-                options={{ headerShown: true }} // Show header with back button
+                options={{ headerShown: false }} // Show header with back button
               />
               <Stack.Screen
                 name="SignIn"

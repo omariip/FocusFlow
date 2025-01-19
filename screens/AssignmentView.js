@@ -229,12 +229,14 @@ const styles = StyleSheet.create({
   },
   adviceItem: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: 10,
+    flexWrap: "wrap", // Ensure text wraps properly
   },
   adviceText: {
-    marginLeft: 10,
+    flex: 1, // Allow text to expand
     fontSize: 16,
+    flexWrap: "wrap",
   },
   checkBox: {
     width: 24,
@@ -245,6 +247,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#007BFF",
+    marginRight: 10,
   },
   loadingText: {
     marginTop: 10,
