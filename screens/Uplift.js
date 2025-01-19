@@ -12,6 +12,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import OpenAI from "openai";
 import axios from "axios";
 import TopBar from "../components/TopBar";
+import Constants from "expo-constants";
 
 const moods = [
   "Anxiety",
@@ -34,9 +35,12 @@ export default function UpliftScreen() {
   const [quote, setQuote] = useState("");
   const [author, setAuthor] = useState("");
 
+  // const apiKey =
+  // Constants.expoConfig?.extra?.apiKey || Constants.manifest?.extra?.apiKey;
+  const apiKey = Constants.expoConfig.extra.apiKey;
+
   const openai = new OpenAI({
-    apiKey:
-      "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",
+    apiKey: apiKey,
   });
 
   // Fetch advice based on the selected mood

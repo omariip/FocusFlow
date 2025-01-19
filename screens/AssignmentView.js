@@ -13,6 +13,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { firestore } from "../firebaseConfig";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import OpenAI from "openai";
+import Constants from "expo-constants";
 
 export default function AssignmentView({ route }) {
   const { assignment } = route.params;
@@ -22,11 +23,11 @@ export default function AssignmentView({ route }) {
   const [loading, setLoading] = useState(true);
   const [checklistExists, setChecklistExists] = useState(false);
 
-  const openai = new OpenAI({
-    apiKey:
-      "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",
-  });
+  const apiKey = Constants.expoConfig.extra.apiKey;
 
+  const openai = new OpenAI({
+    apiKey: apiKey,
+  });
   useEffect(() => {
     const fetchChecklist = async () => {
       try {
@@ -63,7 +64,7 @@ export default function AssignmentView({ route }) {
         messages: [
           {
             role: "user",
-            content: `Provide recommendations for completing the assignment titled "${assignment.assignmentName}".`,
+            content: `Provide recommendations for completing the assignment titled "${textInput}".`,
           },
           {
             role: "user",

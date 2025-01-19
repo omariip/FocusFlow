@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import OpenAI from "openai";
+import Constants from "expo-constants";
 
 const moods = [
   "Anxious",
@@ -30,9 +31,10 @@ export default function Study() {
   const [checkedItems, setCheckedItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const apiKey = Constants.expoConfig.extra.apiKey;
+
   const openai = new OpenAI({
-    apiKey:
-      "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",
+    apiKey: apiKey,
   });
 
   const fetchData = async () => {

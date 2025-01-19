@@ -12,6 +12,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "extra": {
+      "apiKey": "your_api_key_here"
+    },
     "ios": {
       "supportsTablet": true
     },
