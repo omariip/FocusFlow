@@ -20,6 +20,9 @@ import UpliftScreen from "./screens/Uplift";
 import TabNavigator from "./navigation/TabNavigator";
 import Study from "./screens/StudyScreen";
 import AddCourse from "./screens/AddCourse";
+import CourseView from "./screens/CourseView";
+import AddAssignment from "./screens/AddAssignmentView";
+import AssignmentView from "./screens/AssignmentView";
 
 const Stack = createStackNavigator();
 
@@ -124,16 +127,31 @@ export default function App() {
                 component={AddCourse}
                 options={{ headerShown: true }}
               />
+              <Stack.Screen
+                name="CourseView"
+                component={CourseView}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="AddAssignment"
+                component={AddAssignment}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="AssignmentView"
+                component={AssignmentView}
+                options={{ headerShown: true }}
+              />
             </>
           ) : (
             <>
               <Stack.Screen
-                name="Sign In"
+                name="SignIn"
                 component={SignInScreen}
                 options={{ headerShown: true }}
               />
               <Stack.Screen
-                name="Sign Up"
+                name="SignUp"
                 component={SignUpScreen}
                 options={{ headerShown: true }}
               />
@@ -160,6 +178,21 @@ export default function App() {
               <Stack.Screen
                 name="AddCourse"
                 component={AddCourse}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="CourseView"
+                component={CourseView}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="AddAssignment"
+                component={AddAssignment}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="AssignmentView"
+                component={AssignmentView}
                 options={{ headerShown: true }}
               />
             </>

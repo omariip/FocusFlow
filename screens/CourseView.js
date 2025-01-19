@@ -6,69 +6,71 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  Button,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../firebaseConfig";
-import TopBar from "../components/TopBar";
 
-export default function HomeScreen({ navigation }) {
-  const [courses, setCourses] = useState([]);
+export default function CourseView({ route, navigation }) {
+  const { course } = route.params;
+  const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchAssignments = async () => {
       try {
-        const querySnapshot = await getDocs(collection(firestore, "courses"));
-        const fetchedCourses = querySnapshot.docs.map((doc) => ({
+        const querySnapshot = await getDocs(
+          collection(firestore, `courses/${course.id}/assignments`)
+        );
+        const fetchedAssignments = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setCourses(fetchedCourses);
+        setAssignments(fetchedAssignments);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching courses:", error);
+        console.error("Error fetching assignments:", error);
         setLoading(false);
       }
     };
 
-    fetchCourses();
-  }, []);
+    fetchAssignments();
+  }, [course.id]);
 
-  // Render individual course item
-  const renderCourse = ({ item }) => (
-    <TouchableOpacity
-      style={styles.courseItem}
-      onPress={() => navigation.navigate("CourseView", { course: item })}
-    >
-      <Text style={styles.courseName}>{item.courseName}</Text>
-      <Text style={styles.courseDetails}>
-        Professor: {item.courseProfessor}
-      </Text>
-      <Text style={styles.courseDetails}>Time: {item.courseTime}</Text>
-      <Text style={styles.courseDetails}>Location: {item.courseLocation}</Text>
-    </TouchableOpacity>
+  const renderAssignment = ({ item }) => (
+    <View style={styles.assignmentItem}>
+      <Text style={styles.assignmentName}>{item.assignmentName}</Text>
+      <Text style={styles.assignmentDetails}>Due Date: {item.dueDate}</Text>
+      <Button
+        title="Start"
+        onPress={() =>
+          navigation.navigate("AssignmentView", { assignment: item })
+        }
+      />
+    </View>
   );
 
   return (
     <View style={styles.container}>
-      <TopBar />
-
+      <Text style={styles.subtitle}>Assignments</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#007BFF" />
       ) : (
         <FlatList
-          data={courses}
+          data={assignments}
           keyExtractor={(item) => item.id}
-          renderItem={renderCourse}
+          renderItem={renderAssignment}
           contentContainerStyle={styles.listContainer}
         />
       )}
 
-      {/* Floating Add Button */}
+      {/* Floating Add Assignment Button */}
       <TouchableOpacity
         style={styles.floatingButton}
-        onPress={() => navigation.navigate("AddCourse")}
+        onPress={() =>
+          navigation.navigate("AddAssignment", { courseId: course.id })
+        }
       >
         <FontAwesome name="plus" size={24} color="white" />
       </TouchableOpacity>
@@ -82,10 +84,16 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#f9f9f9",
   },
-  listContainer: {
+  subtitle: {
+    fontSize: 20,
+    fontWeight: "bold",
     marginTop: 20,
+    marginBottom: 10,
   },
-  courseItem: {
+  listContainer: {
+    marginTop: 10,
+  },
+  assignmentItem: {
     backgroundColor: "#fff",
     padding: 15,
     marginBottom: 10,
@@ -93,13 +101,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
   },
-  courseName: {
+  assignmentName: {
     fontSize: 18,
     fontWeight: "bold",
   },
-  courseDetails: {
+  assignmentDetails: {
     fontSize: 14,
     color: "#555",
+    marginBottom: 10,
   },
   floatingButton: {
     position: "absolute",

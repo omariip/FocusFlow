@@ -39,9 +39,9 @@ export default function SignInScreen({ navigation, onSignIn }) {
       <Button title="Sign In" onPress={handleSignIn} />
       <Button
         title="Forgot Password?"
-        onPress={() => navigation.navigate("Forgot Password")}
+        onPress={() => navigation.navigate("ForgotPassword")}
       />
-      <Button title="Sign Up" onPress={() => navigation.navigate("Sign Up")} />
+      <Button title="Sign Up" onPress={() => navigation.navigate("SignUp")} />
     </View>
   );
 }

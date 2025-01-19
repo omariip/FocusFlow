@@ -1,24 +1,37 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, Button } from "react-native";
+import { collection, addDoc } from "firebase/firestore";
+import { firestore } from "../firebaseConfig";
 
-export default function AddCourse({ navigation }) {
+const AddCourse = ({ navigation }) => {
   const [courseName, setCourseName] = useState("");
   const [courseProfessor, setCourseProfessor] = useState("");
   const [courseTime, setCourseTime] = useState("");
   const [courseLocation, setCourseLocation] = useState("");
 
-  const handleAddCourse = () => {
-    console.log("Course Added:", {
-      courseName,
-      courseProfessor,
-      courseTime,
-      courseLocation,
-    });
+  const handleAddCourse = async () => {
+    try {
+      const docRef = await addDoc(collection(firestore, "courses"), {
+        courseName,
+        courseProfessor,
+        courseTime,
+        courseLocation,
+        createdAt: new Date(),
+      });
+      console.log("Course added with ID:", docRef.id);
 
-    setCourseName("");
-    setCourseProfessor("");
-    setCourseTime("");
-    setCourseLocation("");
+      setCourseName("");
+      setCourseProfessor("");
+      setCourseTime("");
+      setCourseLocation("");
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Home" }],
+      });
+    } catch (error) {
+      console.error("Error adding course:", error);
+    }
   };
 
   return (
@@ -50,18 +63,12 @@ export default function AddCourse({ navigation }) {
         onChangeText={setCourseLocation}
       />
 
-      <Button
-        title="Add Course"
-        onPress={() =>
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "Home" }],
-          })
-        }
-      />
+      <Button title="Add Course" onPress={handleAddCourse} />
     </View>
   );
-}
+};
+
+export default AddCourse;
 
 const styles = StyleSheet.create({
   container: {
