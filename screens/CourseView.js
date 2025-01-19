@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  Button,
+  Alert,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { firestore } from "../firebaseConfig";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -43,16 +43,55 @@ export default function CourseView({ route, navigation }) {
     }, [course.id])
   );
 
+  // Delete an assignment
+  const deleteAssignment = async (assignmentId) => {
+    try {
+      await deleteDoc(
+        doc(firestore, `courses/${course.id}/assignments`, assignmentId)
+      );
+      setAssignments(
+        assignments.filter((assignment) => assignment.id !== assignmentId)
+      ); // Update UI
+      Alert.alert("Success", "Assignment deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting assignment:", error);
+      Alert.alert("Error", "Failed to delete assignment. Please try again.");
+    }
+  };
+
+  // Confirm delete action
+  const confirmDelete = (assignmentId) => {
+    Alert.alert(
+      "Delete Assignment",
+      "Are you sure you want to delete this assignment?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteAssignment(assignmentId),
+        },
+      ]
+    );
+  };
+
   const renderAssignment = ({ item }) => (
     <View style={styles.assignmentItem}>
-      <Text style={styles.assignmentName}>{item.assignmentName}</Text>
-      <Text style={styles.assignmentDetails}>Due Date: {item.dueDate}</Text>
-      <Button
-        title="Start"
+      <TouchableOpacity
         onPress={() =>
           navigation.navigate("AssignmentView", { assignment: item })
         }
-      />
+        style={{ flex: 1 }}
+      >
+        <Text style={styles.assignmentName}>{item.assignmentName}</Text>
+        <Text style={styles.assignmentDetails}>Due Date: {item.dueDate}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => confirmDelete(item.id)}
+      >
+        <FontAwesome name="trash" size={18} color="white" />
+      </TouchableOpacity>
     </View>
   );
 
@@ -105,6 +144,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ccc",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   assignmentName: {
     fontSize: 18,
@@ -113,7 +155,13 @@ const styles = StyleSheet.create({
   assignmentDetails: {
     fontSize: 14,
     color: "#555",
-    marginBottom: 10,
+  },
+  deleteButton: {
+    backgroundColor: "#E63946",
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
   },
   floatingButton: {
     position: "absolute",

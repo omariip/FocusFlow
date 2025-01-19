@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { firestore } from "../firebaseConfig";
 import TopBar from "../components/TopBar";
 
@@ -35,19 +36,56 @@ export default function HomeScreen({ navigation }) {
     fetchCourses();
   }, []);
 
+  // Delete a course
+  const deleteCourse = async (courseId) => {
+    try {
+      await deleteDoc(doc(firestore, "courses", courseId));
+      setCourses(courses.filter((course) => course.id !== courseId)); // Update UI
+      Alert.alert("Success", "Course deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting course:", error);
+      Alert.alert("Error", "Failed to delete course. Please try again.");
+    }
+  };
+
+  // Confirm delete action
+  const confirmDelete = (courseId) => {
+    Alert.alert(
+      "Delete Course",
+      "Are you sure you want to delete this course?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteCourse(courseId),
+        },
+      ]
+    );
+  };
+
   // Render individual course item
   const renderCourse = ({ item }) => (
-    <TouchableOpacity
-      style={styles.courseItem}
-      onPress={() => navigation.navigate("CourseView", { course: item })}
-    >
-      <Text style={styles.courseName}>{item.courseName}</Text>
-      <Text style={styles.courseDetails}>
-        Professor: {item.courseProfessor}
-      </Text>
-      <Text style={styles.courseDetails}>Time: {item.courseTime}</Text>
-      <Text style={styles.courseDetails}>Location: {item.courseLocation}</Text>
-    </TouchableOpacity>
+    <View style={styles.courseItem}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("CourseView", { course: item })}
+      >
+        <Text style={styles.courseName}>{item.courseName}</Text>
+        <Text style={styles.courseDetails}>
+          Professor: {item.courseProfessor}
+        </Text>
+        <Text style={styles.courseDetails}>Time: {item.courseTime}</Text>
+        <Text style={styles.courseDetails}>
+          Location: {item.courseLocation}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => confirmDelete(item.id)}
+      >
+        <FontAwesome name="trash" size={18} color="white" />
+      </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -92,6 +130,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ccc",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   courseName: {
     fontSize: 18,
@@ -116,5 +157,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  deleteButton: {
+    backgroundColor: "#E63946",
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
