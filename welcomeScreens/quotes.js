@@ -13,8 +13,7 @@ export default function Quotes({ navigation }) {
       {/* Display the title and description */}
       <Text style={styles.title}>Stay Inspired!</Text>
       <Text style={styles.text}>
-        Boost your motivation with personalized quotes and recommendations
-        tailored to your mood and goals.
+      Boost your motivation with generated quotes designed to inspire and keep you moving forward.
       </Text>
 
       {/* Next button */}
