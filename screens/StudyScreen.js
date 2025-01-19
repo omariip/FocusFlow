@@ -7,6 +7,7 @@ import {
   TextInput,
   Alert,
 } from "react-native";
+import TopBar from "../components/TopBar";
 
 export default function Study() {
   const [hours, setHours] = useState("00");
@@ -80,6 +81,7 @@ export default function Study() {
 
   return (
     <View style={styles.container}>
+      <TopBar />
       <View style={styles.timerContainer}>
         <View style={styles.timeInputContainer}>
           <TextInput
@@ -136,10 +138,8 @@ export default function Study() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f9f9f9",
     padding: 20,
+    backgroundColor: "#f9f9f9",
   },
   timerContainer: {
     backgroundColor: "#fff",
@@ -147,6 +147,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e0e0e0",
     borderRadius: 10,
+    marginTop: 50
   },
   timeInputContainer: {
     flexDirection: "row",

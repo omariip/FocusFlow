@@ -22,6 +22,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 10,
+    marginTop: 40,
   },
   appName: {
     fontSize: 24,
