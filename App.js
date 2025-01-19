@@ -19,6 +19,7 @@ import UpliftScreen from "./screens/Uplift";
 // import StudyScreen from "./screens/Study";
 import TabNavigator from "./navigation/TabNavigator";
 import Study from "./screens/StudyScreen";
+import AddCourse from "./screens/AddCourse";
 
 const Stack = createStackNavigator();
 
@@ -118,6 +119,11 @@ export default function App() {
                 component={TabNavigator}
                 options={{ headerShown: true }}
               />
+              <Stack.Screen
+                name="AddCourse"
+                component={AddCourse}
+                options={{ headerShown: true }}
+              />
             </>
           ) : (
             <>
@@ -149,6 +155,11 @@ export default function App() {
               <Stack.Screen
                 name="Home"
                 component={TabNavigator}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="AddCourse"
+                component={AddCourse}
                 options={{ headerShown: true }}
               />
             </>

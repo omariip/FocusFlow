@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import OpenAI from "openai";
+import TopBar from "../components/TopBar";
 
 export default function HomeScreen({ navigation }) {
   const [result, setResult] = useState([]);
@@ -41,7 +42,6 @@ export default function HomeScreen({ navigation }) {
 
       console.log("Raw Response:", completion.choices[0].message.content);
 
-      // Parse the response manually
       const rawResponse = completion.choices[0].message.content;
       const matches = [...rawResponse.matchAll(/advice:\s*\\?"([^"]+)/g)];
 
@@ -81,6 +81,8 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <TopBar />
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.textInput}
@@ -99,17 +101,16 @@ export default function HomeScreen({ navigation }) {
         contentContainerStyle={styles.listContainer}
       />
 
-      {/* <View style={styles.navbar}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-          <Text>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Study")}>
-          <Text>Study</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Uplift")}>
-          <Text>Uplift</Text>
-        </TouchableOpacity>
-      </View> */}
+      {/* Floating Add Button */}
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => {
+          // Handle the button press (e.g., navigation or action)
+          navigation.navigate("AddCourse");
+        }}
+      >
+        <FontAwesome name="plus" size={24} color="white" />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -121,6 +122,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
   },
   inputContainer: {
+    marginTop: 40,
     marginBottom: 20,
   },
   textInput: {
@@ -155,24 +157,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#007BFF",
   },
-  navbar: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderColor: "#ccc",
-    marginTop: 20,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: "center",
-  },
-  addButton: {
+  floatingButton: {
     position: "absolute",
-    bottom: 80,
+    bottom: 20,
     right: 20,
-    backgroundColor: "blue",
-    borderRadius: 50,
-    padding: 10,
+    backgroundColor: "#007BFF",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });

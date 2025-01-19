@@ -9,31 +9,50 @@ import {
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
+import TopBar from "../components/TopBar";
 
-const moods = ['Anxiety', 'Fear', 'Confidence', 'Inspiration', 'Failure', 'Success', 'Happiness', 'Time', 'Future', 'Living'];
+const moods = [
+  "Anxiety",
+  "Fear",
+  "Confidence",
+  "Inspiration",
+  "Failure",
+  "Success",
+  "Happiness",
+  "Time",
+  "Future",
+  "Living",
+];
 
 export default function UpliftScreen({ navigation }) {
   const [selectedMood, setSelectedMood] = useState(null);
-  const [quote, setQuote] = useState('');
-  const [author, setAuthor] = useState('');
-  const [selfCareTips, setSelfCareTips] = useState('');
+  const [quote, setQuote] = useState("");
+  const [author, setAuthor] = useState("");
+  const [selfCareTips, setSelfCareTips] = useState("");
 
   const moodSuggestions = {
-    Anxiety: "Take deep breaths and focus on grounding yourself. Try writing down your thoughts or meditating.",
+    Anxiety:
+      "Take deep breaths and focus on grounding yourself. Try writing down your thoughts or meditating.",
     Fear: "Identify the cause of your fear. Take small steps to address it, and don't hesitate to seek support.",
-    Confidence: "Keep a list of your achievements and remind yourself of your capabilities.",
-    Inspiration: "Explore new ideas or take a walk to spark creativity. Let your surroundings inspire you.",
-    Failure: "Remember, failure is a stepping stone to growth. Reflect and try again.",
-    Success: "Celebrate your wins and express gratitude. Share your joy with loved ones.",
-    Happiness: "Enjoy the moment and spread positivity. A gratitude journal can help maintain happiness.",
+    Confidence:
+      "Keep a list of your achievements and remind yourself of your capabilities.",
+    Inspiration:
+      "Explore new ideas or take a walk to spark creativity. Let your surroundings inspire you.",
+    Failure:
+      "Remember, failure is a stepping stone to growth. Reflect and try again.",
+    Success:
+      "Celebrate your wins and express gratitude. Share your joy with loved ones.",
+    Happiness:
+      "Enjoy the moment and spread positivity. A gratitude journal can help maintain happiness.",
     Time: "Manage your time effectively by prioritizing tasks. Take breaks when needed.",
     Future: "Visualize your goals and take one step at a time toward them.",
-    Living: "Engage in activities that bring you joy. Stay present and cherish the little things."
+    Living:
+      "Engage in activities that bring you joy. Stay present and cherish the little things.",
   };
 
   const fetchQuote = async () => {
     try {
-      const response = await axios.get('https://zenquotes.io/api/random');
+      const response = await axios.get("https://zenquotes.io/api/random");
       const quotes = response.data;
       if (quotes.length > 0) {
         const randomQuote = quotes[0];
@@ -45,7 +64,10 @@ export default function UpliftScreen({ navigation }) {
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to fetch quote. Please check your network connection and try again.');
+      Alert.alert(
+        "Error",
+        "Failed to fetch quote. Please check your network connection and try again."
+      );
     }
   };
 
@@ -59,14 +81,17 @@ export default function UpliftScreen({ navigation }) {
     if (selectedMood) {
       Alert.alert("Self-Care Tips", selfCareTips || "Take care of yourself!");
     } else {
-      Alert.alert("Select a Mood", "Please select a mood to receive suggestions.");
+      Alert.alert(
+        "Select a Mood",
+        "Please select a mood to receive suggestions."
+      );
     }
   };
 
   return (
     <View style={styles.container}>
       {/* Top Bar */}
-      <View style={styles.topBar}>
+      {/* <View style={styles.topBar}>
         <Text style={styles.appName}>FocusFlow</Text>
         <FontAwesome
           name="user"
@@ -74,8 +99,9 @@ export default function UpliftScreen({ navigation }) {
           color="black"
           style={styles.profileIcon}
         />
-      </View>
+      </View> */}
 
+      <TopBar />
       {/* Mood Selector */}
       <View style={styles.questionContainer}>
         <Text style={styles.question}>How are you feeling today?</Text>
@@ -103,8 +129,13 @@ export default function UpliftScreen({ navigation }) {
           <Text style={styles.author}>- {author}</Text>
         </View>
       )}
-      <TouchableOpacity style={styles.suggestionButton} onPress={handleSelfBetterment}>
-        <Text style={styles.suggestionButtonText}>Need Suggestions for Self Betterment?</Text>
+      <TouchableOpacity
+        style={styles.suggestionButton}
+        onPress={handleSelfBetterment}
+      >
+        <Text style={styles.suggestionButtonText}>
+          Need Suggestions for Self Betterment?
+        </Text>
       </TouchableOpacity>
       {/* <View style={styles.navbar}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Home")}>
@@ -172,17 +203,17 @@ const styles = StyleSheet.create({
   },
   author: {
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
   },
   suggestionButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     padding: 15,
     borderRadius: 5,
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 10,
   },
   suggestionButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
   },
   navbar: {
